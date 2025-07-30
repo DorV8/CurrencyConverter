@@ -14,10 +14,8 @@ class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
+        var viewModel = MainViewModel(this.applicationContext)
         setContent {
-            var viewModel = MainViewModel(this.applicationContext)
-
             viewModel.setDataAccount()
 
             NavigationApp(viewModel)
