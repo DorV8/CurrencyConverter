@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.lintChecks
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -7,12 +9,12 @@ plugins {
     id("androidx.room")
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.androidx.navigation.safeargs)
 }
 
 android {
     namespace = "com.example.currencyconverter"
     compileSdk = 35
+
 
     defaultConfig {
         applicationId = "com.example.currencyconverter"
@@ -63,6 +65,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation ("androidx.navigation:navigation-compose:2.9.2")
 //    testImplementation(libs.junit)
 //    testImplementation(libs.testng)
 //    testImplementation(libs.junit.junit)
@@ -82,7 +85,9 @@ dependencies {
     implementation(libs.retrofit2.kotlinx.serialization.converter)
 
     // coil
-    implementation(libs.coil)
+    implementation("io.coil-kt:coil:2.5.0")
+    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation("io.coil-kt:coil-svg:2.5.0")
 
     // room
     implementation(libs.androidx.room.runtime)
@@ -93,10 +98,6 @@ dependencies {
     // hilt
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-
-    // navigation
-    implementation(libs.androidx.navigation.fragment.ktx)
-    implementation(libs.androidx.navigation.ui.ktx)
 
     // coroutine
     implementation(libs.kotlinx.coroutines.core)
