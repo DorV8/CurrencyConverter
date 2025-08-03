@@ -1,16 +1,24 @@
 package com.example.currencyconverter.ui.view
 
 
-import com.example.currencyconverter.R
-import android.util.Log
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -21,12 +29,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.util.DebugLogger
+import com.example.currencyconverter.R
 import com.example.currencyconverter.data.dataSource.viewmodel.MainViewModel
 import com.example.currencyconverter.domain.entity.Currency
 
@@ -34,47 +45,64 @@ import com.example.currencyconverter.domain.entity.Currency
 fun CurrencyScreen(viewModel: MainViewModel, navController: NavController) {
     val enumNames: MutableList<String> = Currency.entries.map { it.name }.toMutableList()
     enumNames.remove(viewModel.accountVM.getPicked())
+    viewModel.setDataAccount()
+    viewModel.setDataTransaction()
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column (modifier = Modifier.verticalScroll(rememberScrollState()))
+        {
+            CurrencyElement(
+                viewModel.accountVM.getPicked(),
+                viewModel.accountVM.getFullName(viewModel.accountVM.getPicked()),
+                viewModel.accountVM.getAmountByTag(viewModel.accountVM.getPicked()),
+                rateCurrency = 0.0,
+                viewModel = viewModel,
+                isPicked = true,
+                navController = navController
+            )
+            val rates by viewModel.ratesFlow.collectAsState()
 
-    Column (modifier = Modifier.verticalScroll(rememberScrollState())) {
-        CurrencyElement(
-            viewModel.accountVM.getPicked(),
-            viewModel.accountVM.getFullName(viewModel.accountVM.getPicked()),
-            viewModel.accountVM.getAmountByTag(viewModel.accountVM.getPicked()),
-            rateCurrency = 0.0,
-            viewModel = viewModel,
-            isPicked = true,
-            navController = navController
-        )
-        val rates by viewModel.ratesFlow.collectAsState()
 
-        if (viewModel.accountVM.getAmountInput() != 1.0) {
-            rates.filter { x -> x.value <= viewModel.accountVM.getAmountByTag(viewModel.accountVM.getPicked()) }.forEach {rate ->
-                CurrencyElement(
-                    codeCurrency = rate.currency,
-                    nameCurrency = viewModel.accountVM.getFullName(rate.currency),
-                    accountCurrency = viewModel.accountVM.getAmountByTag(rate.currency),
-                    rateCurrency = rate.value,
-                    viewModel = viewModel,
-                    isPicked = false,
-                    navController = navController
-                )
-                Log.e("DEBUG_RATE", "name: ${rate.currency}, amount: ${viewModel.accountVM.getAmountByTag(rate.currency)}, rate: ${rate.value}")
+            if (viewModel.accountVM.getAmountInput() != 1.0) {
+                rates.filter { x -> x.value <= viewModel.accountVM.getAmountByTag(viewModel.accountVM.getPicked()) }.forEach {rate ->
+                    CurrencyElement(
+                        codeCurrency = rate.currency,
+                        nameCurrency = viewModel.accountVM.getFullName(rate.currency),
+                        accountCurrency = viewModel.accountVM.getAmountByTag(rate.currency),
+                        rateCurrency = rate.value,
+                        viewModel = viewModel,
+                        isPicked = false,
+                        navController = navController
+                    )
+                    //Log.e("DEBUG_RATE", "name: ${rate.currency}, amount: ${viewModel.accountVM.getAmountByTag(rate.currency)}, rate: ${rate.value}")
+                }
+            }
+            else
+            {
+                rates.forEach {rate ->
+                    CurrencyElement(
+                        codeCurrency = rate.currency,
+                        nameCurrency = viewModel.accountVM.getFullName(rate.currency),
+                        accountCurrency = viewModel.accountVM.getAmountByTag(rate.currency),
+                        rateCurrency = rate.value,
+                        viewModel = viewModel,
+                        isPicked = false,
+                        navController = navController
+                    )
+                    //Log.e("DEBUG_RATE", "name: ${rate.currency}, amount: ${viewModel.accountVM.getAmountByTag(rate.currency)}")
+                }
             }
         }
-        else
-        {
-            rates.forEach {rate ->
-                CurrencyElement(
-                    codeCurrency = rate.currency,
-                    nameCurrency = viewModel.accountVM.getFullName(rate.currency),
-                    accountCurrency = viewModel.accountVM.getAmountByTag(rate.currency),
-                    rateCurrency = rate.value,
-                    viewModel = viewModel,
-                    isPicked = false,
-                    navController = navController
-                )
-                //Log.e("DEBUG_RATE", "name: ${rate.currency}, amount: ${viewModel.accountVM.getAmountByTag(rate.currency)}")
-            }
+        FloatingActionButton(
+            onClick = { navController.navigate("TransactionScreen") },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp),
+            containerColor = MaterialTheme.colorScheme.primaryContainer
+        ) {
+            Icon(
+                imageVector = Icons.Default.Search,
+                contentDescription = "История транзакций"
+            )
         }
     }
 }
@@ -83,7 +111,7 @@ fun CurrencyScreen(viewModel: MainViewModel, navController: NavController) {
 fun CurrencyElement(codeCurrency: String, nameCurrency: String, accountCurrency: Double = 100.0, rateCurrency: Double, viewModel: MainViewModel, isPicked: Boolean, navController: NavController) {
     Row (
         modifier = Modifier.clickable {
-            if (viewModel.accountVM.getAmountInput() != 1.0) {
+            if ((viewModel.accountVM.getAmountInput() != 1.0) && (viewModel.accountVM.getPicked() != codeCurrency)) {
                 viewModel.accountVM.setTradePick(codeCurrency)
                 navController.navigate("TradeScreen")
             }
@@ -111,19 +139,27 @@ fun CurrencyElement(codeCurrency: String, nameCurrency: String, accountCurrency:
 
         if (isPicked) {
             TextField(
-                modifier = Modifier.align(Alignment.Top).fillMaxSize(),
-                value = viewModel.accountVM.getAmountInput().toString(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 8.dp)
+                    .wrapContentWidth(Alignment.End),
+                value = viewModel.accountVM.getSymbol(codeCurrency) + viewModel.accountVM.getAmountInput().toString(),
                 onValueChange = { newValue ->
-                    val filteredValue = newValue//.filter { it.isDigit() || it == '.' }
+                    val filteredValue = newValue.filter { it.isDigit() || it == '.' }
                     viewModel.accountVM.setAmountInput(filteredValue.toDoubleOrNull() ?: 0.0)
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.End),
                 label = { Text("") }
             )
-        }
-        else {
+        } else {
             Text(
-                text = String.format("%.2f",rateCurrency)
+                text = viewModel.accountVM.getSymbol(codeCurrency) + String.format("%.2f", rateCurrency),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 8.dp)
+                    .wrapContentWidth(Alignment.End),
+                textAlign = TextAlign.End
             )
         }
     }

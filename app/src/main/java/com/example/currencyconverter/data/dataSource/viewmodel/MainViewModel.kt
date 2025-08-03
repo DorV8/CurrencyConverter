@@ -22,6 +22,11 @@ class MainViewModel(context: Context): ViewModel() {
         accountVM.setCurrencyList(databaseVM.accountList)
     }
 
+    fun setDataTransaction() {
+        databaseVM.getAllTransactions()
+        transactionVM.setList(databaseVM.transactionList)
+    }
+
     var remote = RemoteRatesServiceImpl()
 
     private val _ratesFlow = MutableStateFlow<List<RateDto>>(emptyList())

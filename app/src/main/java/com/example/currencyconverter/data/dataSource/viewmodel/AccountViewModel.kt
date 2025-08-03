@@ -24,8 +24,7 @@ class AccountViewModel {
     }
 
     fun getAmountByTag(name: String): Double {
-        return 100.toDouble()
-        //return model.getAmountByTag(name)
+        return model.getAmountByTag(name)
     }
 
     fun getFullName(tag: String): String {
@@ -54,6 +53,9 @@ class AccountViewModel {
         return tradedPick
     }
 
+    fun getSymbol(tag: String): String {
+        return currencySymbols[tag].toString()
+    }
 
 }
 
@@ -128,3 +130,40 @@ private val CurrencyImageUrl: Map<String, String> = mapOf(
     "TRY" to "https://flagcdn.com/tr.svg",
     "ZAR" to "https://flagcdn.com/za.svg",
     )
+
+
+private val currencySymbols = mapOf(
+    "USD" to "$",
+    "GBP" to "£",
+    "EUR" to "€",
+    "AUD" to "$",
+    "BGN" to "лв",
+    "BRL" to "R$",
+    "CAD" to "$",
+    "CHF" to "CHF",
+    "CNY" to "¥",
+    "CZK" to "Kč",
+    "DKK" to "kr",
+    "HKD" to "HK$",
+    "HRK" to "kn",
+    "HUF" to "Ft",
+    "IDR" to "Rp",
+    "ILS" to "₪",
+    "INR" to "₹",
+    "ISK" to "kr",
+    "JPY" to "¥",
+    "KRW" to "₩",
+    "MXN" to "$",
+    "MYR" to "RM",
+    "NOK" to "kr",
+    "NZD" to "$",
+    "PHP" to "₱",
+    "PLN" to "zł",
+    "RON" to "lei",
+    "RUB" to "₽",
+    "SEK" to "kr",
+    "SGD" to "S$",
+    "THB" to "฿",
+    "TRY" to "₺",
+    "ZAR" to "R"
+)

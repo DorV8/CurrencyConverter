@@ -7,6 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.currencyconverter.data.dataSource.viewmodel.MainViewModel
 import com.example.currencyconverter.ui.view.CurrencyScreen
 import com.example.currencyconverter.ui.view.TradeScreen
+import com.example.currencyconverter.ui.view.TransactionsScreen
 
 @Composable
 fun NavigationApp(viewModel: MainViewModel) {
@@ -19,5 +20,7 @@ fun NavigationApp(viewModel: MainViewModel) {
         composable("CurrencyScreen") { CurrencyScreen(viewModel, navController) }
 
         composable("TradeScreen") { TradeScreen(viewModel, navController) }
+
+        composable("TransactionScreen") { TransactionsScreen(viewModel, navController) }
     }
 }

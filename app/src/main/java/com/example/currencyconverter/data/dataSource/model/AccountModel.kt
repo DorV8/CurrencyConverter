@@ -24,7 +24,7 @@ class AccountModel {
     }
 
     fun getAmountByTag(name: String): Double {
-        return CurrencyList.find { x -> x.code == name }?.amount ?: 0.0
+        return CurrencyList.find { x -> x.code == name }?.amount ?: 100.0
     }
 
     var codePicked: String = "USD"
